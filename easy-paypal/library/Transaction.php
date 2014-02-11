@@ -61,6 +61,13 @@ class Transaction extends Stored {
   }
 
   /**
+   * @return int|null
+   */
+  public function getId() {
+    return $this->id;
+  }
+
+  /**
    * Get the Paypal Account Email, of the seller
    * @return string|null
    */
@@ -332,24 +339,36 @@ class Transaction extends Stored {
    * @return TransactionInformation
    */
   public function getInformationObject() {
-    $orderInformation = new TransactionInformation();
+    $transactionInformation = new TransactionInformation();
 
-    $orderInformation->id                    = $this->id;
-    $orderInformation->currency              = $this->getCurrency();
-    $orderInformation->businessPayPalAccount = $this->getBusinessPayPalAccount();
-    $orderInformation->handlingPrice         = $this->getHandlingPrice();
-    $orderInformation->payPalDestination     = $this->getPayPalDestination();
-    $orderInformation->transactionType       = $this->getTransactionType();
-    $orderInformation->hasIndividualItems    = $this->getHasIndividualItems();
-    $orderInformation->hasShipping           = $this->getHasShipping();
-    $orderInformation->handlingPrice         = $this->getHandlingPrice();
-    $orderInformation->items                 = $this->getItems();
-    $orderInformation->listeners             = $this->getListeners();
-    $orderInformation->customerCancelUrl     = $this->getCustomerCancelUrl();
-    $orderInformation->customerSuccessUrl    = $this->getCustomerSuccessUrl();
-    $orderInformation->ipnUrl                = $this->getIpnUrl();
+    $transactionInformation->id                    = $this->id;
+    $transactionInformation->currency              = $this->getCurrency();
+    $transactionInformation->businessPayPalAccount = $this->getBusinessPayPalAccount();
+    $transactionInformation->handlingPrice         = $this->getHandlingPrice();
+    $transactionInformation->payPalDestination     = $this->getPayPalDestination();
+    $transactionInformation->transactionType       = $this->getTransactionType();
+    $transactionInformation->hasIndividualItems    = $this->getHasIndividualItems();
+    $transactionInformation->hasShipping           = $this->getHasShipping();
+    $transactionInformation->handlingPrice         = $this->getHandlingPrice();
+    $transactionInformation->items                 = $this->getItems();
+    $transactionInformation->listeners             = $this->getListeners();
+    $transactionInformation->customerCancelUrl     = $this->getCustomerCancelUrl();
+    $transactionInformation->customerSuccessUrl    = $this->getCustomerSuccessUrl();
+    $transactionInformation->ipnUrl                = $this->getIpnUrl();
 
-    return $orderInformation;
+    return $transactionInformation;
+  }
+
+  /**
+   * @return TransactionProcessing
+   */
+  public function getProcessingObject() {
+    $transactionProcessing = new TransactionProcessing();
+
+    $transactionProcessing->setTransactionId($this->id)
+                          ->setListeners($this->getListeners());
+
+    return $transactionProcessing;
   }
 
   protected function _getEntityTableName() {

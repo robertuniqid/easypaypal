@@ -35,12 +35,12 @@ class Helper_EasyPayPal {
 
   }
 
-  public function handleIPN() {
-
-  }
-
   private function _getDatabaseStorageConnection() {
     return new EasyPayPal\DatabaseStorageConnection('localhost', 'root', 'root', 'easy_paypal');
+  }
+
+  public function handleIPN() {
+    $IPNHandler = new EasyPayPal\IPNHandler($this->_getDatabaseStorageConnection());
   }
 
   public function transaction() {
