@@ -9,6 +9,7 @@ namespace EasyPayPal;
  */
 class TransactionInformation {
 
+  public $id;
   public $currency;
   public $businessPayPalAccount;
   public $payPalDestination   = 'https://www.paypal.com/cgi-bin/webscr';
@@ -16,6 +17,9 @@ class TransactionInformation {
   public $hasIndividualItems  = 1;
   public $hasShipping         = 0;
   public $handlingPrice       = 0;
+  public $ipnUrl              = null;
+  public $customerSuccessUrl  = '';
+  public $customerCancelUrl   = '';
 
   public $items;
   public $listeners;
@@ -24,12 +28,16 @@ class TransactionInformation {
     $formHTML = '';
 
     $formHTML .= '<form action="' . $this->payPalDestination . '" method="post">';
+    $formHTML .= '<input type="hidden" name="custom" value="' . $this->id . '">';
     $formHTML .= '<input type="hidden" name="cmd" value="' . $this->transactionType . '">';
     $formHTML .= '<input type="hidden" name="upload" value="' . intval($this->hasIndividualItems) . '">';
     $formHTML .= '<input type="hidden" name="business" value="' . $this->businessPayPalAccount . '">';
     $formHTML .= '<input type="hidden" name="currency_code" value="' . $this->currency . '">';
     $formHTML .= '<input type="hidden" name="no_shipping" value="' . intval($this->hasShipping) . '">';
     $formHTML .= '<input type="hidden" name="handling_cart" value="' . $this->handlingPrice . '">';
+    $formHTML .= '<input type="hidden" name="notify_url" value="' . $this->ipnUrl . '">';
+    $formHTML .= '<input type="hidden" name="return" value="' . $this->customerSuccessUrl . '">';
+    $formHTML .= '<input type="hidden" name="cancel_return" value="' . $this->customerCancelUrl . '">';
 
     foreach($this->_getItemListInformation() as $inputName => $inputValue)
       $formHTML .= '<input type="hidden" name="' . $inputName . '" value="' . $inputValue . '">';

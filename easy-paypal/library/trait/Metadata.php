@@ -33,7 +33,7 @@ trait Metadata {
 
   }
 
-  abstract public function metadataGetEntityName();
-  abstract public function metadataGetEntityId();
+  abstract protected function _metadataGetEntityName();
+  abstract protected function _metadataGetEntityId();
 
 }

@@ -1,4 +1,6 @@
-<h1>This is version alpha 0.1</h1>
+<?php define('BASE_PATH', dirname(__FILE__));?>
+
+<h1>This is version alpha 0.2</h1>
 
 <ul>
   <li>Need to implement database save & option to allow metadata to be set to transactions & transaction items.</li>
@@ -10,23 +12,10 @@
 <hr/>
 
 <?php
-  require_once('easy-paypal/easy-paypal.php');
+  require_once('your-application/helper/easy-paypal.php');
 
-  $orderItem = EasyPayPal::getInstance()->getTransactionItem();
+  $transaction = Helper_EasyPayPal::getInstance()->transaction()->get(26);
 
-  $orderItem->setName('My Awesome Product')
-            ->setPrice(11)
-            ->setQuantity(11);
+  $transactionInformation = $transaction->getInformationObject();
 
-  $order = EasyPayPal::getInstance()->getTransaction();
-
-  $order->setHandlingPrice(12.5)
-        ->addItem($orderItem)
-        ->addItem($orderItem)
-        ->addItem($orderItem)
-        ->addItem($orderItem)
-        ->addItem($orderItem);
-
-  $orderInformation = $order->save()->getInformationObject();
-
-  echo $orderInformation->getPaymentForm();
+  echo $transactionInformation->getPaymentForm();

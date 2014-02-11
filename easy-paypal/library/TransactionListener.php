@@ -7,15 +7,36 @@ namespace EasyPayPal;
  * @package EasyPayPal
  * @author Andrei-Robert Rusu
  */
-class TransactionListener {
+class TransactionListener extends TransactionBound {
+
+  use Metadata;
+
+  protected $_storageTableName    = 'paypal_transaction_listener';
+  protected $_metadataEntityName  = 'transaction_listener';
+
+  protected $_entityToTableDefinition = array(
+    'paypal_transaction_id'  => 'getTransactionId',
+    'param_name'             => 'getParam',
+    'param_value'            => 'getParamValue',
+    'listener'               => 'getSerializedListener',
+  );
+
+  protected $_tableToEntityDefinition = array(
+    'paypal_transaction_id'  => 'setTransactionId',
+    'param_name'             => 'setParam',
+    'param_value'            => 'setParamValue',
+    'listener'               => 'setUnSerializedListener',
+  );
 
   protected $_requiredInformation = array(
     '_param', '_listener'
   );
 
-  private $_param;
-  private $_paramValue;
-  private $_listener;
+  protected $id;
+  protected $transactionId;
+  private   $_param;
+  private   $_paramValue;
+  private   $_listener;
 
   /**
    * Get The param you want to listen to
@@ -75,6 +96,25 @@ class TransactionListener {
   }
 
   /**
+   * Get the Listener serialized
+   * @return string|array
+   */
+  public function getSerializedListener() {
+    return serialize($this->_listener);
+  }
+
+  /**
+   * Set the un serialized listener, called by call_user_func_array();
+   * @param string|array $listener
+   * @return $this
+   */
+  public function setUnSerializedListener($listener) {
+    $this->_listener = unserialize($listener);
+
+    return $this;
+  }
+
+  /**
    * Check if the OrderItem Object is valid and Order Ready
    * @return bool
    */
@@ -86,5 +126,44 @@ class TransactionListener {
         $valid = false;
 
     return $valid;
+  }
+
+  /**
+   * Get the transaction id
+   * @return int|null
+   */
+  public function getTransactionId() {
+    return $this->transactionId;
+  }
+
+  /**
+   * Set the transaction id
+   * @param $transactionId
+   * @return $this
+   */
+  public function setTransactionId($transactionId) {
+    $this->transactionId = $transactionId;
+
+    return $this;
+  }
+
+  protected function _getEntityTableName() {
+    return $this->_storageTableName;
+  }
+
+  protected function _getEntityToTableMap() {
+    return $this->_entityToTableDefinition;
+  }
+
+  protected function _getEntityFromTableMap() {
+    return $this->_tableToEntityDefinition;
+  }
+
+  protected function _metadataGetEntityName() {
+    return $this->_metadataEntityName;
+  }
+
+  protected function _metadataGetEntityId() {
+    return $this->id;
   }
 }

@@ -6,12 +6,28 @@ namespace EasyPayPal;
  * Class TransactionItem
  * @package EasyPayPal
  */
-class TransactionItem extends Stored {
+class TransactionItem extends TransactionBound {
 
   use Metadata;
 
   protected $_storageTableName    = 'paypal_transaction_item';
   protected $_metadataEntityName  = 'transaction_item';
+
+  protected $_entityToTableDefinition = array(
+    'paypal_transaction_id'  => 'getTransactionId',
+    'name'                   => 'getName',
+    'price'                  => 'getPrice',
+    'quantity'               => 'getQuantity',
+    'number'                 => 'getNumber'
+  );
+
+  protected $_tableToEntityDefinition = array(
+    'paypal_transaction_id'  => 'setTransactionId',
+    'name'                   => 'setName',
+    'price'                  => 'setPrice',
+    'quantity'               => 'setQuantity',
+    'number'                 => 'setNumber'
+  );
 
   /**
    * An associative array, objectKey => paypalAlias
@@ -28,6 +44,8 @@ class TransactionItem extends Stored {
     'name', 'price', 'quantity'
   );
 
+  protected $id;
+  protected $transactionId;
   public $name;
   public $price;
   public $quantity = 1;
@@ -137,16 +155,43 @@ class TransactionItem extends Stored {
     return $information;
   }
 
-  public function getEntityTableName() {
+  /**
+   * Get the transaction id
+   * @return int|null
+   */
+  public function getTransactionId() {
+    return $this->transactionId;
+  }
+
+  /**
+   * Set the transaction id
+   * @param $transactionId
+   * @return $this
+   */
+  public function setTransactionId($transactionId) {
+    $this->transactionId = $transactionId;
+
+    return $this;
+  }
+
+  protected function _getEntityTableName() {
     return $this->_storageTableName;
   }
 
-  public function metadataGetEntityName() {
+  protected function _getEntityToTableMap() {
+    return $this->_entityToTableDefinition;
+  }
+
+  protected function _getEntityFromTableMap() {
+    return $this->_tableToEntityDefinition;
+  }
+
+  protected function _metadataGetEntityName() {
     return $this->_metadataEntityName;
   }
 
-  public function metadataGetEntityId() {
-
+  protected function _metadataGetEntityId() {
+    return $this->id;
   }
 
 }

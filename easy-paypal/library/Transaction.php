@@ -14,6 +14,32 @@ class Transaction extends Stored {
   protected $_storageTableName    = 'paypal_transaction';
   protected $_metadataEntityName  = 'transaction';
 
+  protected $_entityToTableDefinition = array(
+    'paypal_account'        => 'getBusinessPayPalAccount',
+    'paypal_destination'    => 'getPayPalDestination',
+    'currency'              => 'getCurrency',
+    'transaction_type'      => 'getTransactionType',
+    'has_individual_items'  => 'getHasIndividualItems',
+    'has_shipping'          => 'getHasShipping',
+    'handling_price'        => 'getHandlingPrice',
+    'ipn_url'               => 'getIpnUrl',
+    'customer_success_url'  => 'getCustomerSuccessUrl',
+    'customer_cancel_url'   => 'getCustomerCancelUrl'
+  );
+
+  protected $_tableToEntityDefinition = array(
+    'paypal_account'        => 'setBusinessPayPalAccount',
+    'paypal_destination'    => 'setPayPalDestination',
+    'currency'              => 'setCurrency',
+    'transaction_type'      => 'setTransactionType',
+    'has_individual_items'  => 'setHasIndividualItems',
+    'has_shipping'          => 'setHasShipping',
+    'handling_price'        => 'setHandlingPrice',
+    'ipn_url'               => 'setIpnUrl',
+    'customer_success_url'  => 'setCustomerSuccessUrl',
+    'customer_cancel_url'   => 'setCustomerCancelUrl'
+  );
+
   protected $id;
   private $_defaultCurrency = 'USD';
   private $_currency;
@@ -23,11 +49,14 @@ class Transaction extends Stored {
   private $_hasIndividualItems  = 1;
   private $_hasShipping         = 0;
   private $_handlingPrice       = 0;
+  private $_ipnUrl              = null;
+  private $_customerSuccessUrl  = '';
+  private $_customerCancelUrl   = '';
 
   protected $_items     = array();
   protected $_listeners = array();
 
-  public function __construct() {
+  public function init() {
     $this->_currency  = $this->_defaultCurrency;
   }
 
@@ -165,6 +194,64 @@ class Transaction extends Stored {
   }
 
   /**
+   * Get the Paypal IPN notification Link
+   * @return null|string
+   */
+  public function getIpnUrl() {
+    return $this->_ipnUrl;
+  }
+
+  /**
+   * Set the Paypal IPN notification Link
+   * @param $ipnUrl
+   * @return $this
+   */
+  public function setIpnUrl($ipnUrl) {
+    $this->_ipnUrl = $ipnUrl;
+
+    return $this;
+  }
+
+  /**
+   * Get the customer return URL on successful payment
+   * @return string
+   */
+  public function getCustomerSuccessUrl() {
+    return $this->_customerSuccessUrl;
+  }
+
+  /**
+   * Set the customer return URL on successful payment
+   * @param string $customerSuccessUrl
+   * @return $this
+   */
+  public function setCustomerSuccessUrl($customerSuccessUrl)
+  {
+    $this->_customerSuccessUrl = $customerSuccessUrl;
+
+    return $this;
+  }
+
+  /**
+   * Get the customer return URL on canceled payment
+   * @return string
+   */
+  public function getCustomerCancelUrl() {
+    return $this->_customerCancelUrl;
+  }
+
+  /**
+   * Set the customer return URL on canceled payment
+   * @param string $customerCancelUrl
+   * @return $this
+   */
+  public function setCustomerCancelUrl($customerCancelUrl) {
+    $this->_customerCancelUrl = $customerCancelUrl;
+
+    return $this;
+  }
+
+  /**
    * @param TransactionItem $item
    * @return $this
    * @throws \Exception
@@ -179,7 +266,7 @@ class Transaction extends Stored {
   }
 
   /**
-   * @return array
+   * @return array()
    */
   public function getItems() {
     return $this->_items;
@@ -207,11 +294,36 @@ class Transaction extends Stored {
   }
 
   /**
+   * Get a transaction by id
+   * @param $transactionId
+   * @return $this
+   */
+  public function get($transactionId) {
+    parent::get($transactionId);
+
+    $transactionItems = new TransactionItem($this->getDatabaseConnection());
+    $this->_items     = $transactionItems->getAllByTransactionId($this->id);
+
+    $transactionListeners = new TransactionListener($this->getDatabaseConnection());
+    $this->_listeners     = $transactionListeners->getAllByTransactionId($this->id);
+
+    return $this;
+  }
+
+  /**
    * Save the current transaction
    * @return $this
    */
   public function save() {
     parent::save();
+
+    foreach($this->_items as $key => $item) {
+      $item->setTransactionId($this->id)->save();
+    }
+
+    foreach($this->_listeners as $key => $listener) {
+      $listener->setTransactionId($this->id)->save();
+    }
 
     return $this;
   }
@@ -222,6 +334,7 @@ class Transaction extends Stored {
   public function getInformationObject() {
     $orderInformation = new TransactionInformation();
 
+    $orderInformation->id                    = $this->id;
     $orderInformation->currency              = $this->getCurrency();
     $orderInformation->businessPayPalAccount = $this->getBusinessPayPalAccount();
     $orderInformation->handlingPrice         = $this->getHandlingPrice();
@@ -232,20 +345,31 @@ class Transaction extends Stored {
     $orderInformation->handlingPrice         = $this->getHandlingPrice();
     $orderInformation->items                 = $this->getItems();
     $orderInformation->listeners             = $this->getListeners();
+    $orderInformation->customerCancelUrl     = $this->getCustomerCancelUrl();
+    $orderInformation->customerSuccessUrl    = $this->getCustomerSuccessUrl();
+    $orderInformation->ipnUrl                = $this->getIpnUrl();
 
     return $orderInformation;
   }
 
-  public function getEntityTableName() {
+  protected function _getEntityTableName() {
     return $this->_storageTableName;
   }
 
-  public function metadataGetEntityName() {
+  protected function _getEntityToTableMap() {
+    return $this->_entityToTableDefinition;
+  }
+
+  protected function _getEntityFromTableMap() {
+    return $this->_tableToEntityDefinition;
+  }
+
+  protected function _metadataGetEntityName() {
     return $this->_metadataEntityName;
   }
 
-  public function metadataGetEntityId() {
-
+  protected function _metadataGetEntityId() {
+    return $this->id;
   }
 
 }
