@@ -4,32 +4,42 @@ namespace EasyPayPal;
 
 /**
  * Stored is the abstract Class which will allow objects / entities to be saved easily in the database.
- * Trait Metadata
+ * This works like a "mini" ORM.
  * @author Andrei-Robert Rusu
  * @package EasyPayPal
  */
 abstract class Stored {
 
   /**
+   * This is the database Connection
    * @var DatabaseConnection
    */
   protected $_databaseConnection;
 
+  /**
+   * Table Name of the entity
+   * @return string
+   */
   abstract protected function _getEntityTableName();
+  /**
+   * Entity To Table map
+   * @return array
+   */
   abstract protected function _getEntityToTableMap();
+  /**
+   * Table To Entity map
+   * @return array
+   */
   abstract protected function _getEntityFromTableMap();
 
   /**
    * @param DatabaseConnection $databaseConnection
-   * @return $this;
    */
   public function __construct(DatabaseConnection $databaseConnection) {
     $this->_databaseConnection = $databaseConnection;
 
     if(method_exists($this, 'init'))
       $this->init();
-
-    return $this;
   }
 
   /**
@@ -51,6 +61,11 @@ abstract class Stored {
     return $this;
   }
 
+  /**
+   * @param $entityId
+   * @return $this
+   * @throws \Exception
+   */
   public function get($entityId) {
     $entityInformation = $this->getDatabaseConnection()->getOne($this->_getEntityTableName(), array('id' => intval($entityId)));
 
@@ -65,6 +80,9 @@ abstract class Stored {
     return $this;
   }
 
+  /**
+   * @return $this
+   */
   public function save() {
     $information = array();
 
@@ -82,6 +100,10 @@ abstract class Stored {
     return $this;
   }
 
+  /**
+   * @param $entityId
+   * @param $entityInformation
+   */
   protected function _setEntityFromTableMap($entityId, $entityInformation) {
     $this->id = intval($entityId);
 

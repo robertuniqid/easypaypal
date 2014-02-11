@@ -1,6 +1,4 @@
 <?php
-// Include them, or add a proper auto-loader
-require_once(BASE_PATH . '/easy-paypal/include.php');
 
 /**
  * Change this class to suit your needs.
@@ -26,9 +24,9 @@ class Helper_EasyPayPal {
    */
   protected $_defaultTransaction = array(
     'setBusinessPayPalAccount'  => 'robert@easy-development.com',
-    'setIpnUrl'                 => 'http://demonstration.easy-development.com/paypal-ipn/your-application/paypal-listener.php',
-    'setCustomerSuccessUrl'     => 'http://demonstration.easy-development.com/paypal-ipn/your-application/example-success.php',
-    'setCustomerCancelUrl'      => 'http://demonstration.easy-development.com/paypal-ipn/your-application/example-canceled.php'
+    'setIpnUrl'                 => '',
+    'setCustomerSuccessUrl'     => '',
+    'setCustomerCancelUrl'      => ''
   );
 
   public function __construct() {
@@ -36,7 +34,7 @@ class Helper_EasyPayPal {
   }
 
   private function _getDatabaseStorageConnection() {
-    return new EasyPayPal\DatabaseStorageConnection('localhost', 'easydeve_ppipn', 'Nv.uvxCX-gZ9', 'easydeve_ppipn');
+    return new EasyPayPal\DatabaseStorageConnection('localhost', 'username', 'password', 'db_name');
   }
 
   public function handleIPN() {

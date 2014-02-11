@@ -9,7 +9,16 @@ namespace EasyPayPal;
  */
 class IPNHandler {
 
+  /**
+   * This is the database Connection
+   * @var DatabaseConnection
+   */
   protected $databaseConnection;
+
+  /**
+   * True if the IPN Notification is valid & sent by PayPal.
+   * @var bool
+   */
   public $isOkay = false;
 
   public function __construct(DatabaseConnection $databaseConnection) {
@@ -44,6 +53,7 @@ class IPNHandler {
   }
 
   /**
+   * Get a Transaction Instance.
    * @return Transaction
    */
   private function _getTransactionInstance() {
