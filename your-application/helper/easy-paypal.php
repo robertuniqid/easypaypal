@@ -36,7 +36,7 @@ class Helper_EasyPayPal {
   }
 
   private function _getDatabaseStorageConnection() {
-    return new EasyPayPal\DatabaseStorageConnection('localhost', 'root', 'root', 'easy_paypal');
+    return new EasyPayPal\DatabaseStorageConnection('localhost', 'easydeve_ppipn', 'Nv.uvxCX-gZ9', 'easydeve_ppipn');
   }
 
   public function handleIPN() {

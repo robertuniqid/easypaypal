@@ -10,7 +10,7 @@ namespace EasyPayPal;
 class IPNHandler {
 
   protected $databaseConnection;
-  public $isOkay;
+  public $isOkay = false;
 
   public function __construct(DatabaseConnection $databaseConnection) {
     $paypalIPNResponse = $_POST;
@@ -30,12 +30,14 @@ class IPNHandler {
     $paypalResponse = file_get_contents($validation);
 
     if($paypalResponse == 'VERIFIED') {
-      $transactionProcessing = $currentTransaction->getProcessingObject();
-      $transactionProcessing->setIpnResponse($_POST)->process();
+        if($paypalResponse['receiver_email'] == $currentTransaction->getBusinessPayPalAccount()) {
 
-      $this->isOkay = true;
-    } else {
-      $this->isOkay = false;
+
+        $transactionProcessing = $currentTransaction->getProcessingObject();
+        $transactionProcessing->setIpnResponse($_POST)->process();
+
+        $this->isOkay = true;
+      }
     }
 
     return $this->isOkay;
