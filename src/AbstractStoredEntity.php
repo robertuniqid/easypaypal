@@ -3,16 +3,16 @@
 namespace EasyPayPal;
 
 /**
- * Stored is the abstract Class which will allow objects / entities to be saved easily in the database.
+ * AbstractStoredEntity is the abstract Class which will allow objects / entities to be saved easily in the database.
  * This works like a "mini" ORM.
  * @author Andrei-Robert Rusu
  * @package EasyPayPal
  */
-abstract class Stored {
+abstract class AbstractStoredEntity {
 
   /**
    * This is the database Connection
-   * @var DatabaseConnection
+   * @var InterfaceDatabaseConnection
    */
   protected $_databaseConnection;
 
@@ -33,9 +33,9 @@ abstract class Stored {
   abstract protected function _getEntityFromTableMap();
 
   /**
-   * @param DatabaseConnection $databaseConnection
+   * @param InterfaceDatabaseConnection $databaseConnection
    */
-  public function __construct(DatabaseConnection $databaseConnection) {
+  public function __construct(InterfaceDatabaseConnection $databaseConnection) {
     $this->_databaseConnection = $databaseConnection;
 
     if(method_exists($this, 'init'))
@@ -52,10 +52,10 @@ abstract class Stored {
 
   /**
    * Set a new database connection
-   * @param DatabaseConnection $databaseConnection
+   * @param InterfaceDatabaseConnection $databaseConnection
    * @return $this
    */
-  public function setDatabaseConnection(DatabaseConnection $databaseConnection) {
+  public function setDatabaseConnection(InterfaceDatabaseConnection $databaseConnection) {
     $this->_databaseConnection = $databaseConnection;
 
     return $this;

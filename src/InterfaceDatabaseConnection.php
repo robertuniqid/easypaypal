@@ -7,7 +7,7 @@ namespace EasyPayPal;
  * @package EasyPayPal
  * @author Andrei-Robert Rusu
  */
-interface DatabaseConnection {
+interface InterfaceDatabaseConnection {
 
   public function query($query);
   public function getAll($tableName, $where);

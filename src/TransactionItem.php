@@ -6,7 +6,7 @@ namespace EasyPayPal;
  * Class TransactionItem
  * @package EasyPayPal
  */
-class TransactionItem extends TransactionBound {
+class TransactionItem extends AbstractTransactionStoredEntity {
 
   use Metadata;
 

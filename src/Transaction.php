@@ -7,7 +7,7 @@ namespace EasyPayPal;
  * @package EasyPayPal
  * @author Andrei-Robert Rusu
  */
-class Transaction extends Stored {
+class Transaction extends AbstractStoredEntity {
 
   use Metadata;
 

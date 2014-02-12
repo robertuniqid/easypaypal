@@ -8,7 +8,7 @@ namespace EasyPayPal;
  * @package EasyPayPal
  * @author Andrei-Robert Rusu
  */
-class DatabaseStorageConnection implements DatabaseConnection {
+class DatabaseStorageConnection implements InterfaceDatabaseConnection {
 
   protected $_lastInsertId = 0;
 

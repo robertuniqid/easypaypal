@@ -3,11 +3,11 @@
 namespace EasyPayPal;
 
 /**
- * Class TransactionBound
+ * Class AbstractTransactionStoredEntity
  * @package EasyPayPal
  * @author Andrei-Robert Rusu
  */
-abstract class TransactionBound extends Stored {
+abstract class AbstractTransactionStoredEntity extends AbstractStoredEntity {
 
   abstract public function getTransactionId();
 

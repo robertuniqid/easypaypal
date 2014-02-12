@@ -21,7 +21,7 @@ class IPNHandler {
    */
   public $isOkay = false;
 
-  public function __construct(DatabaseConnection $databaseConnection) {
+  public function __construct(InterfaceDatabaseConnection $databaseConnection) {
     $paypalIPNResponse = $_POST;
 
     if(!isset($paypalIPNResponse) || empty($paypalIPNResponse))

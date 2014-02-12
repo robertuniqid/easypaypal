@@ -7,7 +7,7 @@ namespace EasyPayPal;
  * @package EasyPayPal
  * @author Andrei-Robert Rusu
  */
-class TransactionListener extends TransactionBound {
+class TransactionListener extends AbstractTransactionStoredEntity {
 
   use Metadata;
 
