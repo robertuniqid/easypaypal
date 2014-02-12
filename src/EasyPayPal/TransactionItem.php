@@ -40,6 +40,10 @@ class TransactionItem extends AbstractTransactionStoredEntity {
     'number'      => 'item_number'
   );
 
+  protected $_informationArrayIgnoreDefinition = array(
+    'number'      => array(0, null)
+  );
+
   protected $_requiredInformation = array(
     'name', 'price', 'quantity'
   );
@@ -148,7 +152,21 @@ class TransactionItem extends AbstractTransactionStoredEntity {
     $information = array();
 
     foreach($this->_informationArrayDefinition as $objectKey => $paypalAlias)
-      if($this->$objectKey !== null)
+      if(!(
+          isset($this->_informationArrayIgnoreDefinition[$objectKey])
+          && (
+              (
+                is_string($this->_informationArrayIgnoreDefinition[$objectKey])
+                && $this->$objectKey = $this->_informationArrayIgnoreDefinition[$objectKey]
+              )
+              ||
+              (
+                is_array($this->_informationArrayIgnoreDefinition[$objectKey])
+                && in_array($this->$objectKey, $this->_informationArrayIgnoreDefinition[$objectKey])
+              )
+             )
+          )
+      )
         $information[$paypalAlias] = $this->$objectKey;
 
 
