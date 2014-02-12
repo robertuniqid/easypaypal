@@ -16,7 +16,7 @@ abstract class AbstractTransactionStoredEntity extends AbstractStoredEntity {
   public function getAllByTransactionId($transactionId) {
     $entityList = $this->getDatabaseConnection()->getAll(
       $this->_getEntityTableName(),
-      'paypal_transaction_id = ' . intval($transactionId)
+      array('paypal_transaction_id' => intval($transactionId))
     );
 
     foreach($entityList as $key => $entity) {

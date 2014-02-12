@@ -11,7 +11,7 @@ class IPNHandler {
 
   /**
    * This is the database Connection
-   * @var DatabaseConnection
+   * @var InterfaceDatabaseConnection
    */
   protected $databaseConnection;
 
