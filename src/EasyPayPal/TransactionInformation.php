@@ -24,7 +24,7 @@ class TransactionInformation {
   public $items;
   public $listeners;
 
-  public function getPaymentForm() {
+  public function getPaymentForm($includeItemListInformation = true) {
     $formHTML = '';
 
     $formHTML .= '<form action="' . $this->payPalDestination . '" method="post">';
@@ -42,7 +42,8 @@ class TransactionInformation {
     foreach($this->_getItemListInformation() as $inputName => $inputValue)
       $formHTML .= '<input type="hidden" name="' . $inputName . '" value="' . $inputValue . '">';
 
-    $formHTML .= $this->_getItemListInformationTable();
+    if($includeItemListInformation)
+      $formHTML .= $this->_getItemListInformationTable();
 
     $formHTML .= '<button>' . Lang::getInterfaceString('checkout') . '</button>';
     $formHTML .= '</form>';

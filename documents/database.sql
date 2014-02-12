@@ -49,7 +49,7 @@ CREATE TABLE `paypal_transaction` (
   `customer_success_url` varchar(1000) NOT NULL,
   `customer_cancel_url` varchar(1000) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=27 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -66,7 +66,7 @@ CREATE TABLE `paypal_transaction_item` (
   `number` varchar(225) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_paypal_transaction_item_paypal_transaction_idx` (`paypal_transaction_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=26 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -82,7 +82,7 @@ CREATE TABLE `paypal_transaction_listener` (
   `listener` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_paypal_transaction_listener_paypal_transaction1_idx` (`paypal_transaction_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Constraints for dumped tables
