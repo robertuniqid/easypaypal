@@ -9,8 +9,6 @@ namespace EasyPayPal;
  */
 class TransactionListener extends AbstractTransactionStoredEntity {
 
-  use Metadata;
-
   protected $_storageTableName    = 'paypal_transaction_listener';
   protected $_metadataEntityName  = 'transaction_listener';
 
