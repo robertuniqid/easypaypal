@@ -29,7 +29,7 @@ class IPNHandler {
 
     $this->databaseConnection = $databaseConnection;
 
-    $currentTransaction    = $this->_getTransactionInstance()->get(26);//$_POST['custom']);
+    $currentTransaction    = $this->_getTransactionInstance()->get($paypalIPNResponse['custom']);
 
     $validation = $currentTransaction->getPayPalDestination() . '?cmd=_notify-validate';
 
@@ -39,11 +39,10 @@ class IPNHandler {
     $paypalResponse = file_get_contents($validation);
 
     if($paypalResponse == 'VERIFIED') {
-        if($paypalResponse['receiver_email'] == $currentTransaction->getBusinessPayPalAccount()) {
-
+      if($paypalIPNResponse['receiver_email'] == $currentTransaction->getBusinessPayPalAccount()) {
 
         $transactionProcessing = $currentTransaction->getProcessingObject();
-        $transactionProcessing->setIpnResponse($_POST)->process();
+        $transactionProcessing->setIpnResponse($paypalIPNResponse)->process();
 
         $this->isOkay = true;
       }
