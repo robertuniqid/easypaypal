@@ -50,8 +50,8 @@ class TransactionProcessing {
   /**
    * @return array
    */
-  public function getIpnResponse() {
-    return $this->_ipnResponse;
+  public function getIpnResponse($param = null) {
+    return ($param == null ? $this->_ipnResponse : $this->_ipnResponse[$param]);
   }
 
   /**
@@ -65,11 +65,13 @@ class TransactionProcessing {
   }
 
   public function process() {
+    $ipnResponse = $this->getIpnResponse();
+
     foreach($this->getListeners() as $listener) {
-      if(isset($this->getIpnResponse()[$listener->getParam()])
+      if(isset($ipnResponse[$listener->getParam()])
           && (
                 ($listener->getParamValue() === null || $listener->getParamValue() === '')
-                  || $this->getIpnResponse()[$listener->getParam()] == $listener->getParamValue()
+                  || $this->getIpnResponse($listener->getParam()) == $listener->getParamValue()
              )
       ) {
         call_user_func($listener->getListener(), $this->getTransactionId(), $this->getIpnResponse());
