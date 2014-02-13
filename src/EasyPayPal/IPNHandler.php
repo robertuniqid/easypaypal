@@ -21,7 +21,7 @@ class IPNHandler {
    */
   public $isOkay = false;
 
-  public function __construct(InterfaceDatabaseConnection $databaseConnection) {
+  public function __construct(InterfaceDatabaseConnection $databaseConnection, $paypalIPNValidation = true) {
     $paypalIPNResponse = $_POST;
 
     if(!isset($paypalIPNResponse) || empty($paypalIPNResponse))
@@ -35,8 +35,11 @@ class IPNHandler {
 
     foreach($paypalIPNResponse as $key => $value)
       $validation .= '&' . $key . '=' . $value;
-
-    $paypalResponse = file_get_contents($validation);
+    
+    if($paypalIPNValidation)
+      $paypalResponse = file_get_contents($validation);
+    else
+      $paypalResponse = 'VERIFIED';
 
     if($paypalResponse == 'VERIFIED') {
       if($paypalIPNResponse['receiver_email'] == $currentTransaction->getBusinessPayPalAccount()) {
