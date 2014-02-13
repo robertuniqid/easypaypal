@@ -35,14 +35,14 @@ class IPNHandler {
 
     foreach($paypalIPNResponse as $key => $value)
       $validation .= '&' . $key . '=' . $value;
-    
+
     if($paypalIPNValidation)
       $paypalResponse = file_get_contents($validation);
     else
       $paypalResponse = 'VERIFIED';
 
     if($paypalResponse == 'VERIFIED') {
-      if($paypalIPNResponse['receiver_email'] == $currentTransaction->getBusinessPayPalAccount()) {
+      if($paypalIPNResponse['business'] == $currentTransaction->getBusinessPayPalAccount()) {
 
         $transactionProcessing = $currentTransaction->getProcessingObject();
         $transactionProcessing->setIpnResponse($paypalIPNResponse)->process();
