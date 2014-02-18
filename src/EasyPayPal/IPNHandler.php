@@ -44,18 +44,19 @@ class IPNHandler {
     if($paypalResponse == 'VERIFIED') {
       if($paypalIPNResponse['business'] == $currentTransaction->getBusinessPayPalAccount()) {
          if($paypalIPNCheckGross) {
-           if($paypalIPNResponse['mc_gross'] == ($currentTransaction->getHandlingPrice() + $currentTransaction->getTotalItemCost())
-              && $paypalIPNResponse['mc_currency'] == $currentTransaction->getCurrency()) {
-              $transactionProcessing = $currentTransaction->getProcessingObject();
-              $transactionProcessing->setIpnResponse($paypalIPNResponse)->process();
+           if($paypalIPNResponse['mc_gross'] == $currentTransaction->getTotalCost()
+              && $paypalIPNResponse['mc_currency'] == $currentTransaction->getCurrency())
               $this->isOkay = true;
-           }
+              
          } else {
-            $transactionProcessing = $currentTransaction->getProcessingObject();
-            $transactionProcessing->setIpnResponse($paypalIPNResponse)->process();
             $this->isOkay = true;
          }
       }
+    }
+    
+    if($this->isOkay == true) {
+      $transactionProcessing = $currentTransaction->getProcessingObject();
+      $transactionProcessing->setIpnResponse($paypalIPNResponse)->process();
     }
 
     return $this->isOkay;
