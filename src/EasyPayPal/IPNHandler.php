@@ -21,7 +21,7 @@ class IPNHandler {
    */
   public $isOkay = false;
 
-  public function __construct(InterfaceDatabaseConnection $databaseConnection, $paypalIPNValidation = true) {
+  public function __construct(InterfaceDatabaseConnection $databaseConnection, $paypalIPNValidation = true, $paypalIPNCheckGross = true) {
     $paypalIPNResponse = $_POST;
 
     if(!isset($paypalIPNResponse) || empty($paypalIPNResponse))
@@ -43,11 +43,18 @@ class IPNHandler {
 
     if($paypalResponse == 'VERIFIED') {
       if($paypalIPNResponse['business'] == $currentTransaction->getBusinessPayPalAccount()) {
-
-        $transactionProcessing = $currentTransaction->getProcessingObject();
-        $transactionProcessing->setIpnResponse($paypalIPNResponse)->process();
-
-        $this->isOkay = true;
+         if($paypalIPNCheckGross) {
+           if($paypalIPNResponse['mc_gross'] == ($currentTransaction->getHandlingPrice() + $currentTransaction->getTotalItemCost())
+              && $paypalIPNResponse['mc_currency'] == $currentTransaction->getCurrency()) {
+              $transactionProcessing = $currentTransaction->getProcessingObject();
+              $transactionProcessing->setIpnResponse($paypalIPNResponse)->process();
+              $this->isOkay = true;
+           }
+         } else {
+            $transactionProcessing = $currentTransaction->getProcessingObject();
+            $transactionProcessing->setIpnResponse($paypalIPNResponse)->process();
+            $this->isOkay = true;
+         }
       }
     }
 
