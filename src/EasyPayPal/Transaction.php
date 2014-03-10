@@ -256,6 +256,14 @@ class Transaction extends AbstractStoredEntity {
 
     return $this;
   }
+  
+  /**
+   * Get the Total Cost, the item total cost & handling price
+   * @return float|int
+   */
+  public function getTotalCost() {
+    return $this->getTotalItemCost() + $this->getHandlingPrice();
+  }
 
   /**
    * Get the Total Cost, the item total cost & handling price
@@ -288,6 +296,22 @@ class Transaction extends AbstractStoredEntity {
    */
   public function getItems() {
     return $this->_items;
+  }
+  
+  /**
+   * Get the total cost of all items
+   * @return float|int
+   */
+  public function getTotalItemCost() {
+    if(empty($this->_items))
+      return 0;
+      
+    $totalItemCost = 0;
+    
+    foreach($this->_items as $item)
+      $totalItemCost += ($item->getPrice() * $item->getQuantity());
+    
+    return $totalItemCost;
   }
 
   /**
