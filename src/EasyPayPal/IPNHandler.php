@@ -21,7 +21,7 @@ class IPNHandler {
    */
   public $isOkay = false;
 
-  public function __construct(InterfaceDatabaseConnection $databaseConnection, $paypalIPNValidation = true) {
+  public function __construct(InterfaceDatabaseConnection $databaseConnection, $paypalIPNValidation = true, $paypalIPNCheckGross = true) {
     $paypalIPNResponse = $_POST;
 
     if(!isset($paypalIPNResponse) || empty($paypalIPNResponse))
@@ -30,6 +30,10 @@ class IPNHandler {
     $this->databaseConnection = $databaseConnection;
 
     $currentTransaction    = $this->_getTransactionInstance()->get($paypalIPNResponse['custom']);
+
+    $transactionNotification = new TransactionNotification($databaseConnection);
+    $transactionNotification->populateFromArray($paypalIPNResponse);
+    $currentTransaction->logTransactionNotification($transactionNotification);
 
     $validation = $currentTransaction->getPayPalDestination() . '?cmd=_notify-validate';
 
@@ -41,14 +45,29 @@ class IPNHandler {
     else
       $paypalResponse = 'VERIFIED';
 
+    if(isset($paypalResponse['test_ipn'])
+        && $paypalResponse['test_ipn'] == 1
+        && !$currentTransaction->isSandBoxTransaction()) {
+      $this->isOkay = false;
+      return $this->isOkay;
+    }
+
     if($paypalResponse == 'VERIFIED') {
       if($paypalIPNResponse['business'] == $currentTransaction->getBusinessPayPalAccount()) {
+        if($paypalIPNCheckGross) {
+          if($paypalIPNResponse['mc_gross'] == $currentTransaction->getTotalCost()
+              && $paypalIPNResponse['mc_currency'] == $currentTransaction->getCurrency())
+            $this->isOkay = true;
 
-        $transactionProcessing = $currentTransaction->getProcessingObject();
-        $transactionProcessing->setIpnResponse($paypalIPNResponse)->process();
-
-        $this->isOkay = true;
+        } else {
+          $this->isOkay = true;
+        }
       }
+    }
+
+    if($this->isOkay == true) {
+      $transactionProcessing = $currentTransaction->getProcessingObject();
+      $transactionProcessing->setIpnResponse($paypalIPNResponse)->process();
     }
 
     return $this->isOkay;

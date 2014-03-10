@@ -51,8 +51,9 @@ class Transaction extends AbstractStoredEntity {
   private $_customerSuccessUrl  = '';
   private $_customerCancelUrl   = '';
 
-  protected $_items     = array();
-  protected $_listeners = array();
+  protected $_items         = array();
+  protected $_listeners     = array();
+  protected $_notifications = array();
 
   public function init() {
     $this->_currency  = $this->_defaultCurrency;
@@ -257,6 +258,14 @@ class Transaction extends AbstractStoredEntity {
   }
 
   /**
+   * Get the Total Cost, the item total cost & handling price
+   * @return float|int
+   */
+  public function getTotalCost() {
+    return $this->getTotalItemCost() + $this->getHandlingPrice();
+  }
+
+  /**
    * @param TransactionItem $item
    * @return $this
    * @throws \Exception
@@ -270,11 +279,31 @@ class Transaction extends AbstractStoredEntity {
     return $this;
   }
 
+  public function isSandBoxTransaction() {
+    return strpos($this->_payPalDestination, 'sandbox.paypal') !== false;
+  }
+
   /**
    * @return array()
    */
   public function getItems() {
     return $this->_items;
+  }
+
+  /**
+   * Get the total cost of all items
+   * @return float|int
+   */
+  public function getTotalItemCost() {
+    if(empty($this->_items))
+      return 0;
+
+    $totalItemCost = 0;
+
+    foreach($this->_items as $item)
+      $totalItemCost += ($item->getPrice() * $item->getQuantity());
+
+    return $totalItemCost;
   }
 
   /**
@@ -299,6 +328,17 @@ class Transaction extends AbstractStoredEntity {
   }
 
   /**
+   * Add a transaction log notification
+   * @param TransactionNotification $notification
+   * @return $this
+   */
+  public function logTransactionNotification(TransactionNotification $notification) {
+    $this->_notifications[] = $notification;
+
+    return $this;
+  }
+
+  /**
    * Get a transaction by id
    * @param $transactionId
    * @return $this
@@ -311,6 +351,9 @@ class Transaction extends AbstractStoredEntity {
 
     $transactionListeners = new TransactionListener($this->getDatabaseConnection());
     $this->_listeners     = $transactionListeners->getAllByTransactionId($this->id);
+
+    $transactionNotifications = new TransactionNotification($this->getDatabaseConnection());
+    $this->_notifications     = $transactionNotifications->getAllByTransactionId($this->id);
 
     return $this;
   }
@@ -328,6 +371,10 @@ class Transaction extends AbstractStoredEntity {
 
     foreach($this->_listeners as $key => $listener) {
       $listener->setTransactionId($this->id)->save();
+    }
+
+    foreach($this->_notifications as $key => $notification) {
+      $notification->setTransactionId($this->id)->save();
     }
 
     return $this;
@@ -364,7 +411,7 @@ class Transaction extends AbstractStoredEntity {
     $transactionProcessing = new TransactionProcessing();
 
     $transactionProcessing->setTransactionId($this->id)
-                          ->setListeners($this->getListeners());
+        ->setListeners($this->getListeners());
 
     return $transactionProcessing;
   }
