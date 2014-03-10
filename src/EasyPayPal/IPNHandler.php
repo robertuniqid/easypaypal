@@ -34,6 +34,7 @@ class IPNHandler {
     $transactionNotification = new TransactionNotification($databaseConnection);
     $transactionNotification->populateFromArray($paypalIPNResponse);
     $currentTransaction->logTransactionNotification($transactionNotification);
+    $currentTransaction->save();
 
     $validation = $currentTransaction->getPayPalDestination() . '?cmd=_notify-validate';
 
