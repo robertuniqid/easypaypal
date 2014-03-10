@@ -115,7 +115,7 @@ abstract class AbstractStoredEntity {
   }
 
   public function populateFromArray($informationArray) {
-    $entityTableTOMAP = $this->_getEntityToTableMap();
+    $entityTableTOMAP = $this->_getEntityFromTableMap();
 
     foreach($informationArray as $structureName => $structureValue)
       if(isset($entityTableTOMAP[$structureName]))
