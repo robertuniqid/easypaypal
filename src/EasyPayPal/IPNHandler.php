@@ -70,11 +70,6 @@ class IPNHandler {
       $transactionProcessing->setIpnResponse($paypalIPNResponse)->process();
     }
 
-    if($this->isOkay == true) {
-      $transactionProcessing = $currentTransaction->getProcessingObject();
-      $transactionProcessing->setIpnResponse($paypalIPNResponse)->process();
-    }
-
     return $this->isOkay;
   }
 
