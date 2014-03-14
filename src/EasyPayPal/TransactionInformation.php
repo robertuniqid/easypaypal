@@ -24,7 +24,16 @@ class TransactionInformation {
   public $items;
   public $listeners;
 
-  public function getPaymentForm($includeItemListInformation = true) {
+  public function getPaymentForm(
+    $includeItemListInformation = true,
+    $styleOptions = array(
+      'table'           => array(
+        'class' => 'paypal_transaction_information'
+      ),
+      'checkout_button' => array(
+        'class' => 'paypal_transaction_checkout_button'
+      )
+    )) {
     $formHTML = '';
 
     $formHTML .= '<form action="' . $this->payPalDestination . '" method="post">';
@@ -39,22 +48,29 @@ class TransactionInformation {
     $formHTML .= '<input type="hidden" name="return" value="' . $this->customerSuccessUrl . '">';
     $formHTML .= '<input type="hidden" name="cancel_return" value="' . $this->customerCancelUrl . '">';
 
-    foreach($this->_getItemListInformation() as $inputName => $inputValue)
+    foreach($this->_getItemListInformation(
+              (isset($styleOptions['table']) ? $styleOptions['table'] : array())
+            ) as $inputName => $inputValue)
       $formHTML .= '<input type="hidden" name="' . $inputName . '" value="' . $inputValue . '">';
 
     if($includeItemListInformation)
       $formHTML .= $this->_getItemListInformationTable();
 
-    $formHTML .= '<button>' . Lang::getInterfaceString('checkout') . '</button>';
+    $formHTML .= '<button ' . (
+                    $this->_styleOptionToString(
+                      isset($styleOptions['checkout_button']) ? $styleOptions['checkout_button'] : array()
+                    )) . '>' .
+                    Lang::getInterfaceString('checkout') .
+                 '</button>';
     $formHTML .= '</form>';
 
     return $formHTML;
   }
 
-  private function _getItemListInformationTable() {
+  private function _getItemListInformationTable(array $tableStyleOptions = array()) {
     $tableHTML = '';
 
-    $tableHTML .= '<table>';
+    $tableHTML .= '<table ' . $this->_styleOptionToString($tableStyleOptions). ' >';
     $tableHTML  .= '<thead>';
     $tableHTML    .= '<tr>';
     $tableHTML      .= '<th>' . Lang::getInterfaceString('item_name'). '</th>';
@@ -95,6 +111,15 @@ class TransactionInformation {
     }
 
     return $information;
+  }
+
+  private function _styleOptionToString($styleOptionArray) {
+    $ret = '';
+
+    foreach($styleOptionArray as $k => $v)
+      $ret .= ' ' . $k . '="' . $v . '" ';
+
+    return $ret;
   }
 
 }
